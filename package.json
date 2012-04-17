@@ -12,6 +12,9 @@
     "url": "http://github.com/idottv/node-mongodb-wrapper/issues"
   },
   "main": "index",
+  "scripts":{
+    "test":"node test.js"
+  },
   "keywords": [
     "mongodb"
   ],
@@ -19,7 +22,7 @@
     "node": ">= 0.6.0"
   },
   "dependencies": {
-    "mongodb": "0.9.6-23",
+    "mongodb": "0.9.9-8",
     "async_testing": "0.3.2"
   },
   "directories": {

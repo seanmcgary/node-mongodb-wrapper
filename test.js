@@ -768,6 +768,17 @@ exports.backgroundIndex = function(assert) {
 }
 
 
+exports.authentication = function(assert) {
+    var db = mongo.db('localhost', 27017, 'test')
+    db.collection('mongo.auth')
+
+    db.mongo.auth.save({one:"two"}, function(err, doc) {
+        assert.ifError(err)
+        assert.finish()
+    })
+}
+
+
 
 if (module == require.main) {
 	require('async_testing').run(__filename, [])

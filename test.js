@@ -6,6 +6,37 @@ var assert = require('assert')
 // we'll reuse it for each
 var mongo = require('./lib/mongodb-wrapper')     
 
+exports.authentication = function(assert) {
+    var db = mongo.db('localhost', 27017, 'test', null, 'baduser', 'badpass')
+    db.collection('mongo.auth')
+
+    // fail bad login 
+    db.mongo.auth.save({one:"two"}, function(err, doc) {
+        assert.ok(err, "Authentication should fail")
+
+        var db = mongo.db('localhost', 27017, 'test')
+
+        db.addUser('user', 'pass', function(err) {
+            assert.ifError(err)
+
+            db.auth('user', 'pass', function(err) {
+                assert.ifError(err)
+
+                var db = mongo.db('localhost', 27017, 'test', null, 'user', 'pass')
+                db.collection('mongo.auth')
+                db.mongo.auth.save({one:"two"}, function(err, doc) {
+                    assert.ifError(err)
+
+                    db.removeUser('user', function(err) {
+                        assert.ifError(err)
+                        assert.finish()
+                    })
+                })
+            })
+        })
+    })
+}
+
 exports.basics = function(assert) {
     var db     = mongo.db("localhost", 27017, "test")
     db.collection('mongo.basics')
@@ -768,17 +799,8 @@ exports.backgroundIndex = function(assert) {
 }
 
 
-exports.authentication = function(assert) {
-    var db = mongo.db('localhost', 27017, 'test')
-    db.collection('mongo.auth')
 
-    db.mongo.auth.save({one:"two"}, function(err, doc) {
-        assert.ifError(err)
-        assert.finish()
-    })
-}
-
-
+//module.exports = {authentication: exports.authentication}
 
 if (module == require.main) {
 	require('async_testing').run(__filename, [])

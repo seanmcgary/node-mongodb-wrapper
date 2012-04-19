@@ -49,12 +49,13 @@ Remember the guiding principle: the syntax exactly matches the [command-line dri
 #### Connecting
 
 `mongo.db(host, port, dbname, [prefix], [username], [password])` - returns an unopened database object. 
+
 * If prefix is specified all collections will use the prefix in mongo, but you refer to them without the prefix in node. 
 * If username and password are specified, it will attempt to authenticate. 
 
 `db.collection(name)` - Returns a `Collection` object. Also creates `db[name]` so you can do this:
     
-    db.collection('user')
+    db.collection('users')
     db.users.count(cb)
 
 

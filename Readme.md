@@ -58,6 +58,24 @@ Remember the guiding principle: the syntax exactly matches the [command-line dri
     db.collection('users')
     db.users.count(cb)
 
+#### Replica Sets
+
+Replica sets are also supported with an alternate function signature:
+``` JavaScript
+var hostsArray = [
+  // opts is a hash of mongodb-native server opts: http://mongodb.github.com/node-mongodb-native/api-generated/server.html
+  // also optional
+  {host: "host1", port: 27017, opts: {}},
+  {host: "host1", port: 27018, opts: {}},
+  ...
+]
+// other replica set opts, such as read_secondary, are passed in here
+// these opts are also passed to each mongodb-native server object, so you can have defaults for your servers
+var opts = {rs_name: "myReplicaSet"}
+
+mongo.db(hostsArray, opts, dbname, [prefix], [username], [password])
+```
+ 
 
 #### Authentication
 

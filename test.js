@@ -7,14 +7,14 @@ var assert = require('assert')
 var mongo = require('./lib/mongodb-wrapper')     
 
 exports.authentication = function(assert) {
-    var db = mongo.db('localhost', 27017, 'test', null, 'baduser', 'badpass')
+    var db = mongo.db('test.i.tv', 27017, 'test', null, 'baduser', 'badpass')
     db.collection('mongo.auth')
 
     // fail bad login 
     db.mongo.auth.save({one:"two"}, function(err, doc) {
         assert.ok(err, "Authentication should fail")
 
-        var db = mongo.db('localhost', 27017, 'test')
+        var db = mongo.db('test.i.tv', 27017, 'test')
 
         db.addUser('user', 'pass', function(err) {
             assert.ifError(err)
@@ -22,7 +22,7 @@ exports.authentication = function(assert) {
             db.auth('user', 'pass', function(err) {
                 assert.ifError(err)
 
-                var db = mongo.db('localhost', 27017, 'test', null, 'user', 'pass')
+                var db = mongo.db('test.i.tv', 27017, 'test', null, 'user', 'pass')
                 db.collection('mongo.auth')
                 db.mongo.auth.save({one:"two"}, function(err, doc) {
                     assert.ifError(err)
@@ -38,7 +38,7 @@ exports.authentication = function(assert) {
 }
 
 exports.basics = function(assert) {
-    var db     = mongo.db("localhost", 27017, "test")
+    var db     = mongo.db("test.i.tv", 27017, "test")
     db.collection('mongo.basics')
     db.toString()
 
@@ -46,10 +46,10 @@ exports.basics = function(assert) {
     db.mongo.basics.toString()
 
 	assert.ok(db.mongo.basics.database())
-	assert.equal(db.host(), "localhost")
+	assert.equal(db.host(), "test.i.tv")
 	assert.equal(db.port(), 27017)
 	
-	var prefixedDb = mongo.db("localhost", 27017, "test", "prefix")
+	var prefixedDb = mongo.db("test.i.tv", 27017, "test", "prefix")
 	assert.equal(prefixedDb.prefix(), "prefix")
 
     // same
@@ -70,7 +70,7 @@ exports.basics = function(assert) {
 }
 
 exports.eval = function(assert) {
-    var db = mongo.db("localhost", 27017, "test")
+    var db = mongo.db("test.i.tv", 27017, "test")
     db.collection('mongo.testEval')
     
     function go() {
@@ -92,7 +92,7 @@ exports.eval = function(assert) {
 }
 
 exports.distinct = function(assert) {
-	var db = mongo.db("localhost", 27017, "test")
+	var db = mongo.db("test.i.tv", 27017, "test")
     db.collection('mongo.distinct')
 
 	db.mongo.distinct.insert({_id:"A", name:"henry"})
@@ -110,7 +110,7 @@ exports.distinct = function(assert) {
 
 
 exports.reset = function(assert) {
-	var db = mongo.db("localhost", 27017, "test")
+	var db = mongo.db("test.i.tv", 27017, "test")
     db.collection('mongo.reset')
 	mongo.log = function() {}
 
@@ -132,7 +132,7 @@ exports.makeSureTheAboveTestDoesntThrowAnError = function(assert) {
 }
 
 exports.disableAutoClose = function(assert) {
-    var db = mongo.db("localhost", 27017, "test")
+    var db = mongo.db("test.i.tv", 27017, "test")
     db.collection('mongo.disableAutoClose')
     
     // get it open
@@ -172,33 +172,37 @@ exports.disableAutoClose = function(assert) {
 
 
 exports.group = function(assert) {
-    var db = mongo.db("localhost", 27017, "test")
+    var db = mongo.db("test.i.tv", 27017, "test")
     db.collection('mongo.testGR')
     db.collection('mongo.outGR')
-    db.mongo.testGR.remove({})
-    db.mongo.testGR.insert([{_id:"one",friends:[{name:"bad",count:2}]}, {_id:"two",friends:[{name:"bad", count:3},{name:"salsa", count:4}]}], function(err) {
-        db.mongo.testGR.group({
-			key: {},
-			cond: {friends:{$exists:true}},
-        	initial: {},
-        	reduce: function(obj, out) {
-				obj.friends.forEach(function(friend) {
-					if (!out[friend.name]) out[friend.name] = 0
-					out[friend.name] += friend.count
-				})
-        	}
-        }, function(err, result) {
-            assert.ifError(err)
-			assert.equal(result[0].bad, 5)
-			assert.equal(result[0].salsa, 4)
-            assert.finish()
-        })        
-
+    db.mongo.testGR.remove({}, function(err) {
+      db.mongo.testGR.insert([{_id:"one",friends:[{name:"bad",count:2}]}, {_id:"two",friends:[{name:"bad", count:3},{name:"salsa", count:4}]}], function(err) {
+        db.lastError(function(err) {
+          assert.ifError(err)
+          db.mongo.testGR.group({
+            key: {},
+            cond: {friends:{$exists:true}},
+            initial: {},
+            reduce: function(obj, out) {
+              obj.friends.forEach(function(friend) {
+                if (!out[friend.name]) out[friend.name] = 0
+                out[friend.name] += friend.count
+              })
+            }
+          }, function(err, result) {
+              assert.ifError(err)
+              assert.ok(result[0], "missing results")
+              assert.equal(result[0].bad, 5)
+              assert.equal(result[0].salsa, 4)
+              assert.finish()
+          })        
+        })
+      })
     })
 }
 
 exports.findAndModify = function(assert) {
-    var db = mongo.db("localhost", 27017, "test");
+    var db = mongo.db("test.i.tv", 27017, "test");
     db.collection('mongo.testFM');
 	db.mongo.testFM.drop();
     db.mongo.testFM.insert({_id:"one", count:1, junk:"trash"}, function(err) {
@@ -220,7 +224,7 @@ exports.findAndModify = function(assert) {
 }
 
 exports.mapReduce = function(assert) {
-    var db = mongo.db("localhost", 27017, "test")
+    var db = mongo.db("test.i.tv", 27017, "test")
     db.collection('mongo.testMR')
     db.collection('mongo.outMR')
     
@@ -247,7 +251,7 @@ exports.mapReduce = function(assert) {
 
 
 exports.renameCollection = function(assert) {
-    var db = mongo.db("localhost", 27017, "test")
+    var db = mongo.db("test.i.tv", 27017, "test")
     db.collection('mongo.startname')
     db.collection('mongo.endname')
     db.collection('mongo.toreplace')
@@ -314,7 +318,7 @@ exports.renameCollection = function(assert) {
 
 
 exports.collectionnames = function(assert) {
-    var db = mongo.db("localhost", 27017, "test")
+    var db = mongo.db("test.i.tv", 27017, "test")
     db.collection('mongo.collection.names.one')
     db.collection('mongo.collection.names.two')
     assert.ok(db.mongo.collection.names.one, "One doesn't exist")
@@ -325,7 +329,7 @@ exports.collectionnames = function(assert) {
 
 exports.redefineCollection = function(assert) {
     var collection, db, secondCollection
-    db = mongo.db("localhost", 27017, "test")
+    db = mongo.db("test.i.tv", 27017, "test")
     collection = db.collection('mongo.redefineCollection')
     secondCollection = db.collection(collection.name())
     assert.equal(collection, secondCollection, "Should have reused collection when redefining")
@@ -334,7 +338,7 @@ exports.redefineCollection = function(assert) {
 
 
 exports.failedInsert = function(assert) {
-    var db = mongo.db("localhost", 27017, "test")
+    var db = mongo.db("test.i.tv", 27017, "test")
     var collection = db.collection('mongo.failedinsert')
 
     // Expected behavior is that the second batch-insert fails. That's really too
@@ -359,7 +363,7 @@ exports.failedInsert = function(assert) {
 
 exports.finding = function(assert) {
     var collection, db
-    db = mongo.db("localhost", 27017, "test")
+    db = mongo.db("test.i.tv", 27017, "test")
     db.collection('mongo.finding')
     collection = db.mongo.finding
     
@@ -369,47 +373,51 @@ exports.finding = function(assert) {
         var cursor, eachIndex, ids
         if (err) throw err 
 
-        collection.save({ _id: "A", color: "red", size: 8 }, assertError)
-        collection.save({ _id: "B", color: "red", size: 6 }, assertError)
-        collection.save({ _id: "C", color: "blue", size: 5 }, assertError)
-        collection.save({ _id: "D", color: "blue", size: 4 }, assertError)
+        collection.insert([{ _id: "A", color: "red", size: 8 }, { _id: "B", color: "red", size: 6 }, { _id: "C", color: "blue", size: 5 }, { _id: "D", color: "blue", size: 4 }], function(err) {
+            assert.ifError(err)
 
-        collection.find({}, { color: 1 }).limit(2).skip(1).sort({ _id: 1 }).toArray(function(err, docs) {
-            if (err) throw err 
-            assert.equal(docs[0]._id, "B", "found the wrong document. Should have been B " + (util.inspect(docs)))
-            assert.equal(docs[0].size, null, "did not limit the fields returned " + (util.inspect(docs)))
-            assert.equal(docs[1]._id, "C")
-        })
+            db.lastError(function(err) {
+              assert.ifError(err)
 
-        collection.findOne({ _id: "B" }, function(err, doc) {
-            if (err) throw err 
-            assert.equal(doc._id, "B")
-        })
-        // Test Each
-        ids = ['A', 'B', 'C', 'D']
-        eachIndex = 0
+              collection.find({}, { color: 1 }).limit(2).skip(1).sort({ _id: 1 }).toArray(function(err, docs) {
+                  assert.ifError(err)
+                  assert.equal(docs.length, 2, "wrong number of docs: " + docs.length)
+                  assert.equal(docs[0]._id, "B", "found the wrong document. Should have been B " + (util.inspect(docs)))
+                  assert.equal(docs[0].size, null, "did not limit the fields returned " + (util.inspect(docs)))
+                  assert.equal(docs[1]._id, "C")
 
-        // each is deprecated for now. Not in use
-        // collection.find().each(function(err, doc) {
-        //     if (err) throw err 
-        //     if (doc) assert.equal(ids[eachIndex], doc._id) 
-        //     eachIndex++
-        // })
+                  collection.findOne({ _id: "B" }, function(err, doc) {
+                      if (err) throw err 
+                      assert.equal(doc._id, "B")
+                  })
+                  // Test Each
+                  ids = ['A', 'B', 'C', 'D']
+                  eachIndex = 0
 
-        collection.count(function(err, num) {
-            if (err) throw err 
-            assert.equal(num, 4)
-        })
-        
-        cursor = collection.find()
+                  // each is deprecated for now. Not in use
+                  // collection.find().each(function(err, doc) {
+                  //     if (err) throw err 
+                  //     if (doc) assert.equal(ids[eachIndex], doc._id) 
+                  //     eachIndex++
+                  // })
 
-        cursor.next(function(err, doc) {
-            if (err) throw err 
-            assert.equal(doc._id, "A")
+                  collection.count(function(err, num) {
+                      if (err) throw err 
+                      assert.equal(num, 4)
+                  })
+                  
+                  cursor = collection.find()
 
-            cursor.next(function(err, doc) {
-                assert.equal(doc._id, "B")
-                assert.finish()
+                  cursor.next(function(err, doc) {
+                      if (err) throw err 
+                      assert.equal(doc._id, "A")
+
+                      cursor.next(function(err, doc) {
+                          assert.equal(doc._id, "B")
+                          assert.finish()
+                      })
+                  })
+              })
             })
         })
     })
@@ -418,7 +426,7 @@ exports.finding = function(assert) {
 
 exports.maintenance = function(assert) {
     var db, maintenance
-    db = mongo.db("localhost", 27017, "test")
+    db = mongo.db("test.i.tv", 27017, "test")
     db.collection('mongo.maintenance')
     maintenance = db.mongo.maintenance
 
@@ -450,7 +458,7 @@ exports.maintenance = function(assert) {
 
 exports.saving = function(assert) {
     var db, saving
-    db = mongo.db("localhost", 27017, "test")
+    db = mongo.db("test.i.tv", 27017, "test")
     db.collection('mongo.saving')
     saving = db.mongo.saving
 
@@ -515,7 +523,7 @@ exports.saving = function(assert) {
 
 exports.indexing = function(assert) {
     var coll, db
-    db = mongo.db("localhost", 27017, "test")
+    db = mongo.db("test.i.tv", 27017, "test")
     db.collection('mongo.indexing')
     coll = db.mongo.indexing
 
@@ -552,7 +560,7 @@ exports.indexing = function(assert) {
 
 
 exports.nextAndInsert = function(assert) {
-    var db = mongo.db("localhost", 27017, "test")
+    var db = mongo.db("test.i.tv", 27017, "test")
     db.collection('mongo.next')
 
     db.mongo.next.drop(function(err) {
@@ -587,7 +595,7 @@ exports.nextAndInsert = function(assert) {
 
 
 exports.dropping = function(assert) {
-    var db = mongo.db("localhost", 27017, "test")
+    var db = mongo.db("test.i.tv", 27017, "test")
     db.collection('mongo.dropping')
 
     db.mongo.dropping.save({ _id: "woot" }, function(err) {
@@ -614,7 +622,7 @@ exports.dropping = function(assert) {
 
 exports.errors = function(assert) {
     var db, verifyError
-    db = mongo.db("localhost", 27017, "test")
+    db = mongo.db("test.i.tv", 27017, "test")
     db.collection('mongo.errors')
 
     function verifyError(err, something) {
@@ -638,7 +646,7 @@ exports.errors = function(assert) {
     // Why doesn't it ever hit the opening thing
 
     exports.noop = function(assert) {}
-    db = mongo.db("localhost", 27017, "test")
+    db = mongo.db("test.i.tv", 27017, "test")
     db.collection('mongo.noop')
     // Mess it up
     // Give it a noop
@@ -653,7 +661,7 @@ exports.errors = function(assert) {
 
 
 exports.reopen = function(assert) {
-    var db = mongo.db("localhost", 27017, "test")
+    var db = mongo.db("test.i.tv", 27017, "test")
     db.collection('mongo.reopen')
 
     db.mongo.reopen.save({ _id: "one" }, function(err, doc) {
@@ -669,7 +677,7 @@ exports.reopen = function(assert) {
 
 
 exports.collections = function(assert) {
-    var db = mongo.db('localhost', 27017, 'test')
+    var db = mongo.db('test.i.tv', 27017, 'test')
     db.collection('system.indexes')
     assert.equal('system.indexes', db.system.indexes.name(), "Mongo didn't work with a compound name")
     assert.equal('test', db.name(), "Mongo renamed the databases name of the compound index")
@@ -677,7 +685,7 @@ exports.collections = function(assert) {
 }
 
 exports.reports = function(assert) {
-    var db = mongo.db('localhost', 27017, 'test')
+    var db = mongo.db('test.i.tv', 27017, 'test')
     db.collection('mongo.reports')
     
     db.mongo.reports.save({_id:"one"}, function(err, doc) {
@@ -691,7 +699,7 @@ exports.reports = function(assert) {
 }
 
 exports.autoClose = function(assert) {
-    var db = mongo.db('localhost', 27017, 'test')
+    var db = mongo.db('test.i.tv', 27017, 'test')
     db.collection('mongo.autoclose')
     
     db.connection(function(err, connection) {
@@ -706,7 +714,7 @@ exports.autoClose = function(assert) {
 }  
 
 exports.objectId = function(assert) {
-	var db = mongo.db('localhost', 27017, 'test')
+	var db = mongo.db('test.i.tv', 27017, 'test')
     db.collection('mongo.objectId')
 
 	db.mongo.objectId.save({key:"value"}, function(err, doc) {
@@ -734,7 +742,7 @@ exports.reconnect = function(assert) {
     
     // Make sure we can recover from an error. 
     
-    var db = mongo.db('localhost', 27017, 'test')
+    var db = mongo.db('test.i.tv', 27017, 'test')
     db.collection('mongo.reconnect') 
     
     var collection = db.mongo.reconnect
@@ -781,7 +789,7 @@ exports.reconnect = function(assert) {
 
 
 exports.backgroundIndex = function(assert) {
-    var db = mongo.db('localhost', 27017, 'test')
+    var db = mongo.db('test.i.tv', 27017, 'test')
     db.collection('mongo.bg')
 
     db.mongo.bg.save({one:"two"}, function(err, doc) {
@@ -803,5 +811,6 @@ exports.backgroundIndex = function(assert) {
 //module.exports = {authentication: exports.authentication}
 
 if (module == require.main) {
+  module.exports = {group: exports.group, finding: exports.finding}
 	require('async_testing').run(__filename, [])
 }

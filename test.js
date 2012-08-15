@@ -803,5 +803,7 @@ exports.backgroundIndex = function(assert) {
 //module.exports = {authentication: exports.authentication}
 
 if (module == require.main) {
-	require('async_testing').run(__filename, [])
+	require('async_testing').run(__filename, [], function() {
+    process.exit()
+  })
 }

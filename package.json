@@ -22,7 +22,7 @@
     "node": ">= 0.6.0"
   },
   "dependencies": {
-    "mongodb": "1.1.4",
+    "mongodb": "0.9.9-8",
     "async_testing": "0.3.2"
   },
   "directories": {

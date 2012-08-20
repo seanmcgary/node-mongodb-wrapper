@@ -44,7 +44,7 @@ For more examples, [please look at the test suite](https://github.com/idottv/nod
 
 ## Documentation
 
-Remember the guiding principle: the syntax exactly matches the [command-line driver][docs], except you pass a call back to any funciton that hits the database. 
+Remember the guiding principle: the syntax exactly matches the [command-line driver][docs], except you pass a call back to any function that hits the database. 
 
 #### Connecting
 

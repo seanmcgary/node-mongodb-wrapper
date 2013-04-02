@@ -22,8 +22,7 @@
     "node": ">= 0.8.0"
   },
   "dependencies": {
-    "mongodb": "0.9.9-8",
-    "async_testing": "0.3.2"
+    "mongodb": "0.9.9-8"
   },
   "directories": {
     "lib": "lib"

@@ -1,7 +1,7 @@
 {
   "name": "node_mongodb_wrapper",
   "description": "Fork of node-mongodb-wrapper",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "author": "i.TV <sean@i.tv>",
   "repository": {
     "type": "git",
@@ -22,8 +22,7 @@
     "node": ">= 0.8.0"
   },
   "dependencies": {
-    "mongodb": "0.9.9-8",
-    "async_testing": "0.3.2"
+    "mongodb": "0.9.9-8"
   },
   "directories": {
     "lib": "lib"

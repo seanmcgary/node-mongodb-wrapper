@@ -3,6 +3,16 @@
   "description": "Fork of node-mongodb-wrapper",
   "version": "0.4.2",
   "author": "i.TV <sean@i.tv>",
+  "contributors": [
+	{
+		"name": "i.TV",
+		"email": "sean@i.tv"
+	},
+	{
+		"name": "Sean McGary",
+		"email": "sean@seanmcgary.com"
+	}
+  ],
   "repository": {
     "type": "git",
     "url": "git://github.com/seanmcgary/node-mongodb-wrapper.git"
@@ -22,7 +32,7 @@
     "node": ">= 0.8.0"
   },
   "dependencies": {
-    "mongodb": "0.9.9-8"
+    "mongodb": "1.2.14"
   },
   "directories": {
     "lib": "lib"

@@ -1,7 +1,7 @@
 {
   "name": "node_mongodb_wrapper",
   "description": "Fork of node-mongodb-wrapper",
-  "version": "0.4.4",
+  "version": "0.4.5",
   "author": "i.TV <sean@i.tv>",
   "contributors": [
 	{
